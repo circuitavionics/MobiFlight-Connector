@@ -30,6 +30,15 @@ namespace MobiFlightInstaller.UI
             }
             else
             {
+                // CXL: MobiFlight is already installed and up to date, so no files will be
+                // downloaded or extracted. Search all existing MobiFlight user.config files
+                // and apply the required Circuit Avionics setting before MobiFlight starts.
+                MobiFlightHelperMethods.CXLFindExistingUserConfigs();
+
+                // CXL: Create the full Circuit Avionics initial user.config only if the
+                // current MobiFlight version does not already have one.
+                MobiFlightHelperMethods.CXLCreateInitialUserConfig();
+
                 MobiFlightUpdaterModel.StartProcessAndClose(MobiFlightHelperMethods.ProcessName);
             }
         }
@@ -61,6 +70,18 @@ namespace MobiFlightInstaller.UI
             UpdaterCurrentTask.Text = "Extracting files...";
             MobiFlightUpdaterModel.CloseMobiFlightAndWait();
             MobiFlightUpdaterModel.GoExtractToDirectory(currentFileName, Directory.GetCurrentDirectory());
+
+            // CXL: MobiFlight has just been installed or updated. Before MobiFlight
+            // starts, search all existing MobiFlight user.config files and apply the
+            // required Circuit Avionics setting. This also protects against an older
+            // setting being carried forward during MobiFlight settings migration.
+            MobiFlightHelperMethods.CXLFindExistingUserConfigs();
+
+            // CXL: After existing configurations have been checked, create the full
+            // Circuit Avionics initial user.config if the current MobiFlight version
+            // does not already have one.
+            MobiFlightHelperMethods.CXLCreateInitialUserConfig();
+
             UpdaterCurrentTask.Text = "Start MobiFlight";
             MobiFlightUpdaterModel.StartProcessAndClose(MobiFlightHelperMethods.ProcessName);
         }

@@ -1,10 +1,12 @@
 # define name of installer
 Unicode True
 !define APPNAME "MobiFlight Connector"
-OutFile "MobiFlight-Setup.exe"
+OutFile "Circuit-Avionics-MobiFlight-Installer-20260821.exe"
 
 !include LogicLib.nsh
 !include MUI2.nsh
+# for creating new pages
+!include "nsDialogs.nsh"
  
 # define installation directory
 InstallDir "$LOCALAPPDATA\MobiFlight\${APPNAME}"
@@ -18,14 +20,17 @@ RequestExecutionLevel user
 !define MUI_UNICON "..\mobiflight.ico"
 !define MUI_ABORTWARNING
 ; !insertmacro MUI_PAGE_DIRECTORY
-!define MUI_WELCOMEFINISHPAGE_BITMAP "setup-welcome.bmp"
-!define MUI_WELCOMEPAGE_TEXT "Setup will guide you through the installation of MobiFlight Connector.$\r$\n\
+!define MUI_WELCOMEFINISHPAGE_BITMAP "setup-welcome-cxl.bmp"
+installbuttontext "Proceed"
+MiscButtonText "< Back" "I understand" "Cancel" "Close"
+!define MUI_WELCOMEPAGE_TITLE "Circuit Avionics MobiFlight Installer"
+!define MUI_WELCOMEPAGE_TEXT "This setup will install MobiFlight Connector with the required settings for Circuit Avionics customers.$\r$\n\
 $\r$\n\
-You need internet connection to download required packages during installation.$\r$\n\
-$\r$\n\
-Click Install to start the installation."
+If you ever need to reinstall MobiFlight, please download this installer from the Circuit Avionics website.$\r$\n\
+This ensures the required settings are applied and prevents unwanted interaction with third-party hardware.$\r$\n"
 
 !insertmacro MUI_PAGE_WELCOME
+Page custom CXLUpdatesPage
 !insertmacro MUI_PAGE_INSTFILES
 
 !define MUI_FINISHPAGE_RUN "$INSTDIR\MFConnector.exe"
@@ -58,6 +63,30 @@ Function .onInit
     notRunning:
 FunctionEnd
 
+Function CXLUpdatesPage
+
+    !insertmacro MUI_HEADER_TEXT "Software and Firmware Updates" "Important information about future updates"
+
+    nsDialogs::Create 1018
+    Pop $0
+
+    ${If} $0 == error
+        Abort
+    ${EndIf}
+
+    ${NSD_CreateLabel} 0 0 100% 120u "MobiFlight may occasionally offer updates to either:$\r$\n$\r$\n\
+- the MobiFlight software on your PC, or$\r$\n\
+- the firmware installed on your Circuit Avionics device.$\r$\n$\r$\n\
+These updates are optional, and your hardware will continue to operate normally without them.$\r$\n$\r$\n\
+Software updates to MobiFlight can be installed normally.$\r$\n$\r$\n\
+If you choose to install a firmware update, please connect the Circuit Avionics device directly to a USB port on the PC before proceeding. Do not perform firmware updates through a USB hub, adapter, or extension device."
+
+    Pop $0
+
+    nsDialogs::Show
+
+FunctionEnd
+
 # start default section
 Section "install"
     SetRegView 64
@@ -65,13 +94,13 @@ Section "install"
     SetOutPath $INSTDIR
 
     # Add the MobiFlight installer
-    File "..\Release\MobiFlight-Installer.exe"
+    File "..\Release\MobiFlight-Installer-CXL.exe"
     File "..\mobiflight.ico"
  
     # create the uninstaller
     WriteUninstaller "$INSTDIR\uninstall.exe"
 
-    ExecWait '"$INSTDIR\MobiFlight-Installer.exe" /installOnly'
+    ExecWait '"$INSTDIR\MobiFlight-Installer-CXL.exe" /installOnly'
  
     # Register file associations for .mfproj and .mcc files
     Call RegisterFileAssociations

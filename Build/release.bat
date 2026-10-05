@@ -5,6 +5,7 @@ SET RELEASE_DIR=%SOLUTION_DIR%Release
 SET BUILD_TOOLS_DIR=%SOLUTION_DIR%Build\
 SET CMD_RAR=utils\7z\7z.exe
 SET INSTALLER_NAME=MobiFlight-Installer
+SET CXL_INSTALLER_NAME=MobiFlight-Installer-CXL
 
 echo -----------------------------------------------------------
 echo CLEAN install log file
@@ -16,6 +17,7 @@ echo CLEAN Release Directory
 echo -----------------------------------------------------------
 del %RELEASE_DIR%\MobiFlightConnector-release.* /Q
 del %RELEASE_DIR%\%INSTALLER_NAME%.exe /Q
+del %RELEASE_DIR%\%CXL_INSTALLER_NAME%.exe /Q
 echo OK
 
 echo -----------------------------------------------------------
@@ -29,7 +31,9 @@ echo -----------------------------------------------------------
 echo Building MobiFlight-Connector ZIP package
 echo -----------------------------------------------------------
 %BUILD_TOOLS_DIR%%CMD_RAR% a %RELEASE_DIR%\MobiFlightConnector-release.zip %TARGET_DIR%*.* -r
-copy %SOLUTION_DIR%src\%INSTALLER_NAME%\bin\Release\%INSTALLER_NAME%.exe %RELEASE_DIR%\
+REM Copy the compiled standard MobiFlight installer into the Release folder
+REM and rename the packaged copy to MobiFlight-Installer-CXL.exe.
+copy "%SOLUTION_DIR%src\%INSTALLER_NAME%\bin\Release\%INSTALLER_NAME%.exe" "%RELEASE_DIR%\%CXL_INSTALLER_NAME%.exe"
 echo OK
 
 echo -----------------------------------------------------------

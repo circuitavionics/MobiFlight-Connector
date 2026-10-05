@@ -150,24 +150,18 @@ namespace MobiFlightInstaller
                     // ignore the old update file.
                     if (file.Name == OldMobiFlightUpdaterName) continue;
 
-                    if (file.Name == "MobiFlight-Installer.exe")
-                    {
-                        if (InstallerIsNewer(file)) // NewInstaller have greater version than current
-                        {
-                            System.IO.FileInfo FileInstaller = new System.IO.FileInfo(System.Reflection.Assembly.GetExecutingAssembly().Location);
-
-                            String backupFile = FileInstaller.DirectoryName + "\\" + FileInstaller.Name.Replace(FileInstaller.Extension, ".old");
-
-                            if (File.Exists(backupFile))
-                                System.IO.File.Delete(backupFile);
-                            System.IO.File.Move(FileInstaller.FullName, backupFile);
-                        }
-                        else
-                        {
-                            Log.Instance.log("Mobiflight-Installer no need to be upgrade, extracting file skipped", LogSeverity.Info);
-                            continue;
-                        }
-                    }
+// CXL: The original MobiFlight code contained special handling here for
+// MobiFlight-Installer.exe. It treated the installer inside the downloaded
+// package as a possible replacement for the currently running installer.
+//
+// The Circuit Avionics installer runs under the different filename
+// MobiFlight-Installer-CXL.exe, so the original replacement logic no longer
+// works correctly and can cause an exception.
+//
+// That original special-case code has therefore been removed. The official
+// MobiFlight-Installer.exe contained in the downloaded package is extracted
+// normally, so the installed MobiFlight copy keeps the standard official
+// installer for future MobiFlight updates.
 
                     if (file.Name == "install.log.txt")
                     {
